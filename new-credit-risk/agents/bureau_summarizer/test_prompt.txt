@@ -1,0 +1,7 @@
+Summarize the borrower’s profile from Company A’s valid document.
+
+Compare Company A's fraud vs valid profile and highlight discrepancies.
+
+Evaluate Company B’s credit profile and mark any payment issues.
+
+Summarize all four documents and provide a risk rating for each.

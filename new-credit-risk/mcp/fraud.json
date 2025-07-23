@@ -1,0 +1,53 @@
+{
+  "agent": "fraud_detection",
+  "description": "Identifies potential fraud indicators and risk factors",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "summary": { "type": "string" }
+    },
+    "required": ["summary"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "agentName": { "type": "string" },
+      "agentDescription": { "type": "string" },
+      "completedAt": { "type": "string", "format": "date-time" },
+      "confidenceScore": { "type": "number" },
+      "errorMessage": { "type": ["string", "null"] },
+      "status": { "type": "string" },
+      "extractedData": {
+        "type": "object",
+        "properties": {
+          "fraud_risk_score": { "type": "number" },
+          "risk_level": { "type": "string" },
+          "document_authenticity": { "type": "number" },
+          "verification_status": { "type": "string" },
+          "flagged_items": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "required": [
+          "fraud_risk_score",
+          "risk_level",
+          "document_authenticity",
+          "verification_status",
+          "flagged_items"
+        ]
+      },
+      "summary": { "type": "string" }
+    },
+    "required": [
+      "agentName",
+      "agentDescription",
+      "completedAt",
+      "confidenceScore",
+      "errorMessage",
+      "status",
+      "extractedData",
+      "summary"
+    ]
+  }
+}

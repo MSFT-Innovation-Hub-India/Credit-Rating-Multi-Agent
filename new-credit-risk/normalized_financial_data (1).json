@@ -1,0 +1,14 @@
+{
+  "net_sales": 119575.0,
+  "cost_of_sales": 64720.0,
+  "gross_margin": 54855.0,
+  "operating_expenses": 14482.0,
+  "operating_income": 40373.0,
+  "net_income": 33916.0,
+  "total_assets": 353514.0,
+  "total_liabilities": 279414.0,
+  "shareholders_equity": null,
+  "cash_flow_operations": 39895.0,
+  "cash_flow_investing": 1927.0,
+  "cash_flow_financing": -30585.0
+}

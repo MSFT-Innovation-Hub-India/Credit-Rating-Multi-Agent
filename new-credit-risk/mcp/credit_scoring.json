@@ -1,0 +1,50 @@
+{
+  "agent": "credit_scoring",
+  "description": "Calculates credit risk and assigns AAA–DDD rating",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "summary": { "type": "string" }
+    },
+    "required": ["summary"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "agentName": { "type": "string" },
+      "agentDescription": { "type": "string" },
+      "completedAt": { "type": "string", "format": "date-time" },
+      "confidenceScore": { "type": "number" },
+      "errorMessage": { "type": ["string", "null"] },
+      "status": { "type": "string" },
+      "extractedData": {
+        "type": "object",
+        "properties": {
+          "credit_score": { "type": "string" },
+          "financial_strength_score": { "type": "number" },
+          "market_position_score": { "type": "number" },
+          "probability_of_default": { "type": "number" },
+          "risk_factors": { "type": "string" }
+        },
+        "required": [
+          "credit_score",
+          "financial_strength_score",
+          "market_position_score",
+          "probability_of_default",
+          "risk_factors"
+        ]
+      },
+      "summary": { "type": "string" }
+    },
+    "required": [
+      "agentName",
+      "agentDescription",
+      "completedAt",
+      "confidenceScore",
+      "errorMessage",
+      "status",
+      "extractedData",
+      "summary"
+    ]
+  }
+}

@@ -1,0 +1,1 @@
+credit_util_ratio,eps_basic,eps_diluted,avg_monthly_income,cash_and_equivalents,high_utilization_flag

@@ -1,0 +1,60 @@
+{
+  "agent": "bureau",
+  "description": "Analyzes and summarizes business documents and financial statements",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "summary": { "type": "string", "description": "Raw text summary from RAG engine" }
+    },
+    "required": ["summary"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "agentName": { "type": "string" },
+      "agentDescription": { "type": "string" },
+      "completedAt": { "type": "string", "format": "date-time" },
+      "confidenceScore": { "type": "number" },
+      "errorMessage": { "type": ["string", "null"] },
+      "status": { "type": "string" },
+      "extractedData": {
+        "type": "object",
+        "properties": {
+          "company_name": { "type": ["string", "null"] },
+          "industry": { "type": ["string", "null"] },
+          "annual_revenue": { "type": ["string", "null"] },
+          "employees": { "type": ["integer", "null"] },
+          "years_in_business": { "type": ["integer", "null"] },
+          "key_financial_metrics": {
+            "type": "object",
+            "properties": {
+              "revenue_growth": { "type": ["number", "null"] },
+              "profit_margin": { "type": ["number", "null"] },
+              "debt_to_equity": { "type": ["number", "null"] }
+            },
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "company_name",
+          "industry",
+          "annual_revenue",
+          "employees",
+          "years_in_business",
+          "key_financial_metrics"
+        ]
+      },
+      "summary": { "type": "string" }
+    },
+    "required": [
+      "agentName",
+      "agentDescription",
+      "completedAt",
+      "confidenceScore",
+      "errorMessage",
+      "status",
+      "extractedData",
+      "summary"
+    ]
+  }
+}

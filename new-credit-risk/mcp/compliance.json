@@ -1,0 +1,20 @@
+{
+  "agent": "compliance_agent",
+  "description": "Checks regulatory compliance and flags risks",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "summary": { "type": "string" }
+    },
+    "required": ["summary"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "risk_level": { "type": "string" },
+      "compliance_issues": { "type": "string" },
+      "recommendations": { "type": "string" }
+    },
+    "required": ["risk_level", "compliance_issues", "recommendations"]
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "agent": "explainability",
+  "description": "Provides detailed explanation of analysis decisions and factors",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "summary": { "type": "string" }
+    },
+    "required": ["summary"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "agentName": { "type": "string" },
+      "agentDescription": { "type": "string" },
+      "completedAt": { "type": "string", "format": "date-time" },
+      "confidenceScore": { "type": "number" },
+      "errorMessage": { "type": ["string", "null"] },
+      "status": { "type": "string" },
+      "extractedData": {
+        "type": "object",
+        "properties": {
+          "decision_factors": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "weight_distribution": {
+            "type": "object",
+            "additionalProperties": { "type": "number" }
+          },
+          "confidence_reasoning": { "type": "string" }
+        },
+        "required": ["decision_factors", "weight_distribution", "confidence_reasoning"]
+      },
+      "summary": { "type": "string" }
+    },
+    "required": [
+      "agentName",
+      "agentDescription",
+      "completedAt",
+      "confidenceScore",
+      "errorMessage",
+      "status",
+      "extractedData",
+      "summary"
+    ]
+  }
+}

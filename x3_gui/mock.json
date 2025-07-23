@@ -1,0 +1,92 @@
+{
+    "bureau_summary": {
+        "agentDescription": "Analyzes and summarizes business documents and financial statements",
+        "agentName": "Bureau Summariser",
+        "completedAt": "2025-07-11T09:18:23.155598Z",
+        "confidenceScore": 0.92,
+        "errorMessage": null,
+        "extractedData": {
+            "annual_revenue": 1.81,
+            "company_name": "TerraDrive Mobility Corp.",
+            "employees": null,
+            "industry": "Mobility / Transportation",
+            "key_financial_metrics": {
+                "debt_to_equity": 4.17,
+                "profit_margin": null,
+                "revenue_growth": -13
+            },
+            "years_in_business": null
+        },
+        "status": "AgentStatus.complete",
+        "summary": "TerraDrive Mobility Corp. is a struggling mobility services company currently operating at a loss and experiencing declining revenues. With a 13% year-over-year revenue drop and no clear profitability, the firm relies heavily on debt financing, reflected in its high estimated debt-to-equity ratio of 4.17. Despite ongoing restructuring efforts and significant capital investments, free cash flow remains negative, and adjusted EBITDA is deeply in the red. Liquidity concerns persist, and the company is dependent on refinancing and asset-backed securities to maintain operations. Its financial instability and negative margins suggest heightened credit risk in the near term."
+    },
+    "compliance_check": {
+        "compliance_issues": "High Fraud Risk",
+        "recommendations": "TerraDrive Mobility Corp. exhibits clear signs of financial distress and potential fraudulent activities. The declining revenues, negative free cash flow, and deeply negative EBITDA indicate severe financial instability. The high debt-to-equity ratio of 4.17 raises concerns about the company's ability to meet its financial obligations. The reliance on debt financing, ongoing restructuring efforts, and liquidity concerns further amplify the risk of financial fraud. It is recommended to conduct a thorough investigation into the company's financial statements, operations, and management practices to uncover any potential fraudulent activities.",
+        "risk_level": "High Fraud Risk"
+    },
+    "credit_scoring": {
+        "agentDescription": "Calculates credit risk and assigns AAA–DDD rating",
+        "agentName": "Credit Score Rating",
+        "completedAt": "2025-07-14T05:05:33.401407Z",
+        "confidenceScore": 0.89,
+        "errorMessage": null,
+        "extractedData": {
+            "credit_score": "DDD",
+            "financial_strength_score": 0.2,
+            "market_position_score": 0.4,
+            "probability_of_default": 0.35,
+            "risk_factors": [
+                "Operating at a loss",
+                "Declining revenues",
+                "High debt-to-equity ratio",
+                "Negative free cash flow",
+                "Negative adjusted EBITDA",
+                "Liquidity concerns"
+            ]
+        },
+        "status": "AgentStatus.complete",
+        "summary": "The credit rating for TerraDrive Mobility Corp. is DDD (High Risk) with a Probability of Default (PD) score of 35%. The company is experiencing financial instability, negative margins, and liquidity concerns, indicating heightened credit risk."
+    },
+    "explainability": {
+        "agentDescription": "Provides detailed explanation of analysis decisions and factors",
+        "agentName": "Explainability",
+        "completedAt": "2025-07-14T05:05:43.707127Z",
+        "confidenceScore": 0.88,
+        "errorMessage": null,
+        "extractedData": {
+            "confidence_reasoning": "\nThe following summary explains why a machine learning model predicted a certain level of credit default risk for a company.\n\nIt is based on various financial indicators and characteristics such as revenue, net income, total assets and liabilities, equity, industry type, and country of operation. Each of these factors influences the risk level in different ways — either increasing or reducing it.\n\nKey drivers behind this prediction include:\nnum_Revenue: -0.0598\nnumTotal_Assets: -0.0474\nnumNet_Income: -0.0431\nnumEquity: -0.0403\nnumTotal_Liabilities: +0.0267\ncatCountry_US: -0.0232\ncat_Industry_Sector_Manufacturing: -0.0184\n\nOverall, the model has assessed a moderate level of risk based on these inputs. Please provide a clear and concise explanation of this prediction in business-friendly language, highlighting the most influential factors and their impact on the risk assessment.\n",
+            "decision_factors": [
+                "Num  Revenue",
+                "Num  Total Assets",
+                "Num  Net Income"
+            ],
+            "weight_distribution": {
+                "business_stability": 0.0474,
+                "financial_performance": 0.0598,
+                "market_position": 0.0431
+            }
+        },
+        "status": "AgentStatus.complete",
+        "summary": "\nThe following summary explains why a machine learning model predicted a certain level of credit default risk for a company.\n\nIt is based on various financial indicators and characteristics such as revenue, net income, total assets and liabilities, equity, industry type, and country of operation. Ea..."
+    },
+    "fraud_detection": {
+        "agentDescription": "Identifies potential fraud indicators and risk factors",
+        "agentName": "Fraud Detection",
+        "completedAt": "2025-07-14T05:05:53.336622Z",
+        "confidenceScore": 0.92,
+        "errorMessage": null,
+        "extractedData": {
+            "document_authenticity": 0.13,
+            "flagged_items": [
+                "Unusual liabilities",
+                "Equity mismatch"
+            ],
+            "fraud_risk_score": 0.92,
+            "risk_level": "High",
+            "verification_status": "Needs Review"
+        },
+        "status": "AgentStatus.complete",
+        "summary": "Fraud Risk Assessment: High Fraud Risk\nJustification: The financial summary indicates zero values for revenue, net income, total assets, total liabilities, and equity, which is highly unusual and suggests potential manipulation or concealment of financial information, leading to a high fraud risk score of 0.92."
+    }
+}
