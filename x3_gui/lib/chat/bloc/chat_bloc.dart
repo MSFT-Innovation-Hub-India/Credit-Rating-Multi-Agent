@@ -4,7 +4,7 @@ import 'package:x3_gui/chat/bloc/chat_event.dart';
 import 'package:x3_gui/chat/bloc/chat_state.dart';
 import 'package:x3_gui/models/document_model.dart';
 import 'package:x3_gui/models/agentanalysis_model.dart';
-import 'package:x3_gui/services/chat_llm_service.dart'; // CORRECT: Still using Gemini
+import 'package:x3_gui/services/azure_openai_service.dart'; // UPDATED: Now using Azure OpenAI
 import 'package:x3_gui/services/document_storage_service.dart';
 import 'package:x3_gui/services/agent_orchestration_service.dart';
 import 'package:x3_gui/services/tts_service.dart';
@@ -12,7 +12,8 @@ import 'package:x3_gui/services/speech_recording_service.dart';
 import 'dart:async';
 
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
-  final GeminiService _geminiService; // CORRECT: Still using Gemini
+  final AzureOpenAIService
+  _azureOpenAIService; // UPDATED: Now using Azure OpenAI
   final DocumentStorageService _documentService;
   final AgentOrchestrationService _agentOrchestrationService;
   final TTSService _ttsService;
@@ -20,7 +21,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   StreamSubscription<List<AnalysisResults>>? _analysisSubscription;
 
   ChatBloc(
-    this._geminiService,
+    this._azureOpenAIService, // UPDATED: Parameter name changed
     this._documentService,
     this._agentOrchestrationService,
     this._ttsService,
@@ -115,6 +116,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     _agentOrchestrationService.dispose();
     _ttsService.dispose();
     _speechService.dispose();
+    _azureOpenAIService.dispose(); // UPDATED: Dispose Azure OpenAI service
     return super.close();
   }
 
@@ -151,7 +153,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       ),
     ); //UI will display USER MESSAGE + LOADING SPINNER
 
-    //Step 4: Call the LLM service to get a response WITH CONTEXT
+    //Step 4: Call the Azure OpenAI service to get a response WITH CONTEXT
     try {
       // Convert chat messages to conversation history format
       final conversationHistory = currentMessages
@@ -170,14 +172,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         ),
       );
 
-      // Use context-aware generation that includes uploaded documents
+      // UPDATED: Use Azure OpenAI service methods
       final response = isDocumentRelatedQuery || currentDocuments.isEmpty
-          ? await _geminiService.generateResponseWithDocumentGuidance(
+          ? await _azureOpenAIService.generateResponseWithDocumentGuidance(
               event.message,
               conversationHistory,
               currentDocuments,
             )
-          : await _geminiService.generateResponseWithContext(
+          : await _azureOpenAIService.generateResponseWithContext(
               event.message,
               conversationHistory,
               currentDocuments,

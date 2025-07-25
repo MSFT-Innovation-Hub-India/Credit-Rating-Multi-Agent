@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:x3_gui/chat/bloc/chat_bloc.dart';
 import 'package:x3_gui/chat/bloc/chat_event.dart';
 import 'package:x3_gui/chat/bloc/chat_state.dart';
-import 'package:x3_gui/services/chat_llm_service.dart';
+import 'package:x3_gui/services/azure_openai_service.dart'; // UPDATED: Now using Azure OpenAI
 import 'package:x3_gui/services/document_storage_service.dart';
 import 'package:x3_gui/chat/widgets/chat_widgets_barrel.dart';
 import 'package:x3_gui/chat/widgets/document_status_widget.dart';
@@ -18,7 +18,7 @@ class ChatScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => ChatBloc(
-        GeminiService(),
+        AzureOpenAIService(), // UPDATED: Now using Azure OpenAI instead of Gemini
         DocumentStorageService(),
         AgentOrchestrationService(),
         TTSService(),

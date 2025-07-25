@@ -1,4 +1,12 @@
 class AzureConfig {
+  //Azure OpenAI Model for Chat LLM
+  static const String OpenAIendpoint =
+      'https://YOUR-OPENAI-ENDPOINT.openai.azure.com/';
+  static const String OpenAIdeploymentName = 'YOUR-DEPLOYMENT-NAME';
+  static const String OpenAIapiVersion = 'XXXX-XX-XX';
+  static const String OpenAIapiKey =
+      'YOUR-OPENAI-API-KEY'; // Your Azure OpenAI API key
+
   //Blob Storage for Docs Configuration
   static const String storageAccount = 'YOUR-STORAGE-ACCOUNT-NAME';
   static const String containerName = 'YOUR-CONTAINER-NAME';

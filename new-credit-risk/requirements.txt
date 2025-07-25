@@ -18,3 +18,5 @@ gunicorn
 asyncio
 semantic-kernel
 json 
+azure-search-documents
+

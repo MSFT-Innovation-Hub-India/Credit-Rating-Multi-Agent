@@ -1,40 +1,25 @@
-/*
-Using Gemini API for the chat LLM service.
-This is only for testing, because Gemini is easy, free and quick to set up
-Plus the GGA package is GOATED
-Final version should switch to OpenAI on Azure or similar Microsoft Model
-
-Notes:
-For demo only requiring 4 documents to be uploaded:
-- Qualitative Business Documents (Business Plan, Executive Summary, Market Analysis)
-- Balance Sheet
-- Cash Flow Statement
-- Profit & Loss Statement
-This is a simplified version, in production we will require more documents
-
-*/
-
-import 'package:google_generative_ai/google_generative_ai.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:x3_gui/services/llm_service_interface.dart';
 import 'package:x3_gui/models/document_model.dart';
+import "azure_config.dart";
 
-class GeminiService implements LLMServiceInterface {
-  late final GenerativeModel _model;
-  late final ChatSession
-  _chatSession; //TODO: This is from GGA SDK, will need to code equivalent class later when we switch to OpenAI on Azure
+class AzureOpenAIService implements LLMServiceInterface {
+  static const String _endpoint = AzureConfig.OpenAIendpoint;
+  static const String _deploymentName = AzureConfig.OpenAIdeploymentName;
+  static const String _apiVersion = AzureConfig.OpenAIapiVersion;
+  static const String _apiKey = AzureConfig.OpenAIapiKey;
 
-  GeminiService() {
-    const apiKey = 'YOUR-API-KEY';
+  final http.Client _httpClient;
+  final List<Map<String, String>> _conversationHistory = [];
 
-    _model = GenerativeModel(
-      model: 'gemini-2.5-flash',
-      apiKey: apiKey,
-      systemInstruction: Content.system(_getSystemPrompt()),
-    );
-
-    _chatSession = _model
-        .startChat(); //Todo: From GGA SDK, will need to code equivalent class later when we switch to OpenAI on Azure
+  AzureOpenAIService() : _httpClient = http.Client() {
+    // Initialize with system message
+    _conversationHistory.add({'role': 'system', 'content': _getSystemPrompt()});
   }
+
+  String get _baseUrl =>
+      '$_endpoint/openai/deployments/$_deploymentName/chat/completions?api-version=$_apiVersion';
 
   //MARK: System Prompt
   String _getSystemPrompt() {
@@ -75,7 +60,43 @@ Remember: You are helping with corporate credit assessment for these 4 specific 
 ''';
   }
 
-  //MARK: Doc Helpers
+  Future<String> _makeOpenAIRequest(List<Map<String, String>> messages) async {
+    try {
+      final requestBody = {
+        'messages': messages,
+        'max_tokens': 1000,
+        'temperature': 0.7,
+        'top_p': 0.95,
+        'frequency_penalty': 0,
+        'presence_penalty': 0,
+      };
+
+      final response = await _httpClient.post(
+        Uri.parse(_baseUrl),
+        headers: {'Content-Type': 'application/json', 'api-key': _apiKey},
+        body: jsonEncode(requestBody),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        final content =
+            responseData['choices']?[0]?['message']?['content'] as String?;
+        return content ?? 'Sorry, I could not generate a response.';
+      } else {
+        print(
+          'Azure OpenAI API Error: ${response.statusCode} - ${response.body}',
+        );
+        throw Exception(
+          'Failed to get response from Azure OpenAI: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      print('Error making Azure OpenAI request: $e');
+      throw Exception('Failed to communicate with Azure OpenAI: $e');
+    }
+  }
+
+  //MARK: Doc Helpers (same as Gemini service)
   List<DocumentType> _getRequiredDocumentTypes() {
     return [
       DocumentType.qualitativeBusiness,
@@ -87,7 +108,6 @@ Remember: You are helping with corporate credit assessment for these 4 specific 
   }
 
   List<DocumentType> _prioritizeDocumentTypes(List<DocumentType> types) {
-    //Priotize the document types based on importance for credit scoring
     final priority = [
       DocumentType.balanceSheet,
       DocumentType.cashFlow,
@@ -96,13 +116,11 @@ Remember: You are helping with corporate credit assessment for these 4 specific 
       DocumentType.earningsCall,
     ];
     final prioritized = <DocumentType>[];
-    // Add high-priority types first
     for (final priorityType in priority) {
       if (types.contains(priorityType)) {
         prioritized.add(priorityType);
       }
     }
-    // Add remaining types
     for (final type in types) {
       if (!prioritized.contains(type)) {
         prioritized.add(type);
@@ -141,7 +159,7 @@ Remember: You are helping with corporate credit assessment for these 4 specific 
       case DocumentType.earningsCall:
         return 'Earnings Call';
       default:
-        return 'Other Financial Document'; // Default case for other types
+        return 'Other Financial Document';
     }
   }
 
@@ -179,7 +197,6 @@ Remember: You are helping with corporate credit assessment for these 4 specific 
     }
   }
 
-  //MARK: Filter Doc Status
   List<Map<String, String>> _filterDocumentStatusMessages(
     List<Map<String, String>> conversationHistory,
   ) {
@@ -187,7 +204,6 @@ Remember: You are helping with corporate credit assessment for these 4 specific 
       final content = message['content']?.toLowerCase() ?? '';
       final isAssistantMessage = message['role'] == 'assistant';
 
-      // Filter out assistant messages that mention document uploads/status
       if (isAssistantMessage) {
         final documentStatusKeywords = [
           'uploaded successfully',
@@ -195,7 +211,10 @@ Remember: You are helping with corporate credit assessment for these 4 specific 
           'uploaded documents:',
           'remaining documents needed:',
           'all required documents',
-          '✅', '❗', '📋', '🎉', // Status emojis
+          '✅',
+          '❗',
+          '📋',
+          '🎉',
         ];
 
         final containsDocumentStatus = documentStatusKeywords.any(
@@ -204,19 +223,16 @@ Remember: You are helping with corporate credit assessment for these 4 specific 
 
         return !containsDocumentStatus;
       }
-      // Keep all user messages
       return true;
     }).toList();
   }
 
-  //MARK: CONTEXT HELP
   String _buildContextPrompt(
     String userPrompt,
     List<Map<String, String>> conversationHistory,
     List<Document> uploadedDocuments,
   ) {
     final buffer = StringBuffer();
-    // PRIORITY 1: Current document state (most important)
     buffer.writeln('CURRENT DOCUMENT STATUS:');
     if (uploadedDocuments.isNotEmpty) {
       buffer.writeln('Currently uploaded documents:');
@@ -230,24 +246,19 @@ Remember: You are helping with corporate credit assessment for these 4 specific 
     }
     buffer.writeln();
 
-    // PRIORITY 2: Filtered conversation context (remove document status messages)
     if (conversationHistory.isNotEmpty) {
       buffer.writeln('RECENT CONVERSATION CONTEXT:');
       final filteredHistory = _filterDocumentStatusMessages(
         conversationHistory,
       );
       for (final message in filteredHistory.take(8)) {
-        // Reduced from 10 to 8 to make room for document status
         buffer.writeln('${message['role']}: ${message['content']}');
       }
       buffer.writeln();
     }
 
-    // PRIORITY 3: Current user prompt
     buffer.writeln('USER CURRENT MESSAGE: $userPrompt');
     buffer.writeln();
-
-    // PRIORITY 4: Explicit instruction to use current state
     buffer.writeln(
       'IMPORTANT: Base your response on the CURRENT DOCUMENT STATUS above, not on any previous conversation history about documents.',
     );
@@ -255,14 +266,32 @@ Remember: You are helping with corporate credit assessment for these 4 specific 
     return buffer.toString();
   }
 
-  //MARK: abstract methods
+  //MARK: Interface Implementation
   @override
   Future<String> generateResponse(String prompt) async {
     try {
-      final response = await _chatSession.sendMessage(Content.text(prompt));
-      return response.text ?? 'Sorry, I could not generate a response.';
+      final messages = [
+        ..._conversationHistory,
+        {'role': 'user', 'content': prompt},
+      ];
+
+      final response = await _makeOpenAIRequest(messages);
+
+      // Update conversation history
+      _conversationHistory.add({'role': 'user', 'content': prompt});
+      _conversationHistory.add({'role': 'assistant', 'content': response});
+
+      // Keep only last 20 messages to prevent context overflow
+      if (_conversationHistory.length > 20) {
+        _conversationHistory.removeRange(
+          1,
+          _conversationHistory.length - 19,
+        ); // Keep system message
+      }
+
+      return response;
     } catch (e) {
-      throw Exception('Failed to get response from the chat bot: $e');
+      throw Exception('Failed to get response from Azure OpenAI: $e');
     }
   }
 
@@ -273,17 +302,19 @@ Remember: You are helping with corporate credit assessment for these 4 specific 
     List<Document> uploadedDocuments,
   ) async {
     try {
-      // Build context-aware prompt
       final contextPrompt = _buildContextPrompt(
         prompt,
         conversationHistory,
         uploadedDocuments,
       );
 
-      final response = await _chatSession.sendMessage(
-        Content.text(contextPrompt),
-      );
-      return response.text ?? 'Sorry, I could not generate a response.';
+      final messages = [
+        {'role': 'system', 'content': _getSystemPrompt()},
+        ...conversationHistory.take(10), // Limit context to prevent overflow
+        {'role': 'user', 'content': contextPrompt},
+      ];
+
+      return await _makeOpenAIRequest(messages);
     } catch (e) {
       throw Exception('Failed to generate response with context: $e');
     }
@@ -305,7 +336,6 @@ Remember: You are helping with corporate credit assessment for these 4 specific 
     buffer.writeln("📋 **Document Upload Progress**\n");
 
     if (uploadedDocuments.isNotEmpty) {
-      //and there are some remaining types (ie uploaded some of the 4 needed)
       buffer.writeln("✅ **Uploaded Documents:**");
       for (final doc in uploadedDocuments) {
         buffer.writeln(
@@ -330,18 +360,15 @@ Remember: You are helping with corporate credit assessment for these 4 specific 
     return buffer.toString();
   }
 
-  //MARK: ContextDoc
   Future<String> generateResponseWithDocumentGuidance(
     String userMessage,
     List<Map<String, String>> conversationHistory,
     List<Document> uploadedDocuments,
   ) async {
     try {
-      // Always include document guidance for this method
       final documentGuidanceContent = getDocumentUploadGuidance(
         uploadedDocuments,
       );
-
       final contextPrompt = _buildContextPrompt(
         userMessage,
         conversationHistory,
@@ -357,12 +384,19 @@ $contextPrompt
 Please provide a helpful response that addresses the user's question while being aware of their document upload progress. If they need guidance on uploading documents, provide it. If all documents are uploaded, focus on their question about the documents.
 ''';
 
-      final response = await _chatSession.sendMessage(Content.text(fullPrompt));
+      final messages = [
+        {'role': 'system', 'content': _getSystemPrompt()},
+        ...conversationHistory.take(8), // Reduced to prevent context overflow
+        {'role': 'user', 'content': fullPrompt},
+      ];
 
-      return response.text ??
-          'I apologize, but I encountered an error generating a response.';
+      return await _makeOpenAIRequest(messages);
     } catch (e) {
       throw Exception('Failed to generate response with document guidance: $e');
     }
+  }
+
+  void dispose() {
+    _httpClient.close();
   }
 }
