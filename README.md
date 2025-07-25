@@ -1,6 +1,8 @@
 # Credit-Rating-Multi-Agent
 
-There are two directories in this repo.
+There are three directories in this repo.
+
+**Data:** Contains the synthetic financial files on which we tested the project, as well as model details and prompts for our AI Foundry agents. 
 
 **x3_gui** is the client side code. (has its own detailed Readme for configuration and running). 
 
